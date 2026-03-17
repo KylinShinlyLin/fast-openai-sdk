@@ -63,10 +63,12 @@ local.properties
 .LSOverride
 Icon
 ._*
-
+.qoze
 # Private Properties (Demo purposes)
 src/main/resources/fast-openai.properties
 publish-settings.xml
 # Test Output Files
 test_speech_output.mp3
 /publish-settings.xml
+src/test/resources/fast-openai.properties
+/.qoze/

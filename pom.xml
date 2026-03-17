@@ -6,8 +6,8 @@
 
     <groupId>io.github.kylinshinlylin</groupId>
     <artifactId>fast-openai-sdk</artifactId>
-    <version>1.0.0</version>
-    
+    <version>1.0.0-SNAPSHOT</version>
+
     <name>Fast OpenAI SDK</name>
     <description>A fast and lightweight OpenAI SDK for Java</description>
     <url>https://github.com/KylinShinlyLin/fast-openai-sdk</url>
@@ -189,18 +189,12 @@
                     <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
-            
+
             <!-- 生成 Source 源码包 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.3.0</version>
-
-
-
-
-
-
 
 
                 <executions>

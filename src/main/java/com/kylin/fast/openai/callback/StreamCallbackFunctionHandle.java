@@ -117,15 +117,26 @@ public class StreamCallbackFunctionHandle implements Callback<ResponseBody> {
                                 }
                             });
                 }
-                if (CollectionUtils.isNotEmpty(result.getChoices()) &&
+
+                // 检查是否是结束标记，但同时可能有内容
+                boolean isFinishStop = CollectionUtils.isNotEmpty(result.getChoices()) &&
                         result.getChoices().stream()
                                 .map(ChatCompletionStreamChoice::getFinish_reason)
                                 .filter(Objects::nonNull)
-                                .anyMatch(s -> s.equals("stop"))) {
-                    //过滤掉无效内容 这时候是触发函数
+                                .anyMatch(s -> s.equals("stop"));
+
+                // 检查是否有实际内容（工具调用或文本内容）
+                boolean hasToolCalls = result.triggerFunction();
+                boolean hasContent = CollectionUtils.isNotEmpty(result.getChoices()) &&
+                        result.getChoices().stream()
+                                .map(ChatCompletionStreamChoice::getDelta)
+                                .map(ChatMessage::getContent)
+                                .anyMatch(StringUtils::isNotBlank);
+
+                // 如果是停止标记但没有内容，则跳过
+                if (isFinishStop && !hasToolCalls && !hasContent) {
                     continue;
                 }
-
 
                 if (!receivedFirstContent.get()) {
                     //首个流

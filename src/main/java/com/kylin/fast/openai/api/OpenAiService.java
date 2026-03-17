@@ -247,7 +247,7 @@ public class OpenAiService {
                 countDownLatch, request, executor, instanceName);
         createChatStream(request, headers, callbackHandle);
         // 同步阻塞的方式，执行 executor
-        countDownLatch.await(120, TimeUnit.SECONDS);
+        countDownLatch.await(this.timeout.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     @SneakyThrows
@@ -257,7 +257,7 @@ public class OpenAiService {
                 countDownLatch, request, executor, instanceName);
         createChatStream(request, headers, queryParams, callbackHandle);
         // 同步阻塞的方式，执行 executor
-        countDownLatch.await(120, TimeUnit.SECONDS);
+        countDownLatch.await(this.timeout.toMillis(), TimeUnit.MILLISECONDS);
     }
 
 
@@ -379,7 +379,7 @@ public class OpenAiService {
             // Pass headers and queryParams
             createChatStream(request, headers, queryParams, callbackHandle);
             // 同步阻塞的方式，执行 executor
-            countDownLatch.await(120, TimeUnit.SECONDS);
+            countDownLatch.await(this.timeout.toMillis(), TimeUnit.MILLISECONDS);
 
             //判断是否触发函数，如果触发，会自动执行函数并更新request，然后continue循环
             if (!this.triggerStreamFunction(request, callbackHandle, funHandles, contextHandler)) {

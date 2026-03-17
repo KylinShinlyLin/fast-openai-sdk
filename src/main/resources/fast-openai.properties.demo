@@ -1,7 +1,7 @@
 # OpenAI API Keys, comma separated for load balancing
-openai.api.keys=sk-your-key-here,sk-another-key-here
+openai.api.keys=sh-xxxxxxxxx,sh-xxxxxxxxx
 # OpenAI Base URL
-openai.api.baseUrl=https://api.openai.com/
+# openai.api.baseUrl=https://api.openai.com/
 # Request Timeout in seconds
 openai.api.timeout=60
 # Max retries
@@ -10,3 +10,4 @@ openai.api.maxRetries=3
 # openai.proxy.host=127.0.0.1
 # openai.proxy.port=7890
 # openai.proxy.type=HTTP
+# jina.api.key=sh-xxxxxxxxx
