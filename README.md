@@ -26,6 +26,8 @@
   - [3. 流式对话 (SSE 打字机效果)](#3-流式对话-sse-打字机效果)
   - [4. 视觉能力 (多模态图片理解)](#4-视觉能力-多模态图片理解)
   - [5. 函数调用 (Function Calling)](#5-函数调用-function-calling)
+  - [6. 文本转语音 (TTS)](#6-文本转语音-tts)
+  - [7. 语音转文本 (Whisper ASR)](#7-语音转文本-whisper-asr)
 - [🗂️ 核心包结构说明](#️-核心包结构与架构说明)
 - [🤝 参与贡献](#-参与贡献)
 
@@ -280,6 +282,92 @@ public class FunctionCallingStreamDemo {
 
 ---
 
+
+---
+
+### 6. 文本转语音 (TTS)
+
+SDK 内置了对 OpenAI TTS (Text-to-Speech) 的支持，可将文本转换为自然流畅的语音。
+
+```java
+import com.kylin.fast.openai.api.OpenAiService;
+import com.kylin.fast.openai.config.OpenAiConfig;
+import com.kylin.fast.openai.request.SpeechRequest;
+import java.io.File;
+
+public class TTSDemo {
+    public static void main(String[] args) {
+        OpenAiService service = new OpenAiService(OpenAiConfig.loadFromProperties());
+
+        SpeechRequest request = SpeechRequest.builder()
+                .model("gpt-4o-mini-tts-2025-12-15")  // 或 "tts-1", "tts-1-hd"
+                .input("你好，欢迎使用 Fast OpenAI SDK！这是一个文本转语音的演示。")
+                .voice("alloy")                       // 可选: alloy, echo, fable, onyx, nova, shimmer
+                .response_format("mp3")               // 可选: mp3, opus, aac, flac
+                .speed(1.0)                           // 语速: 0.25 ~ 4.0，默认 1.0
+                .build();
+
+        // 生成语音文件到指定路径
+        String outputPath = "output_speech.mp3";
+        File audioFile = service.speech(request, outputPath);
+        System.out.println("语音文件已生成: " + audioFile.getAbsolutePath());
+    }
+}
+```
+
+**参数说明：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `model` | String | ✅ | TTS 模型，支持 `tts-1`, `tts-1-hd`, `gpt-4o-mini-tts-2025-12-15` |
+| `input` | String | ✅ | 要转换为语音的文本，最多 4096 个字符 |
+| `voice` | String | ✅ | 语音类型：`alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer` |
+
+---
+
+### 7. 语音转文本 (Whisper ASR)
+
+SDK 支持 OpenAI Whisper 模型的语音识别能力，可将音频文件转换为文本。
+
+```java
+import com.kylin.fast.openai.api.OpenAiService;
+import com.kylin.fast.openai.config.OpenAiConfig;
+import com.kylin.fast.openai.request.AudioTextRequest;
+import com.kylin.fast.openai.result.WhisperResult;
+import java.io.File;
+
+public class WhisperDemo {
+    public static void main(String[] args) {
+        OpenAiService service = new OpenAiService(OpenAiConfig.loadFromProperties());
+
+        // 准备音频文件 (支持 mp3, mp4, mpeg, mpga, m4a, wav, webm 格式)
+        File audioFile = new File("output_speech.mp3");
+
+        AudioTextRequest request = AudioTextRequest.builder()
+                .model("whisper-1")                   // 语音识别模型
+                .responseFormat("text")               // 可选: json, text, srt, verbose_json, vtt
+                .language("zh")                       // 指定语言 ISO-639-1 编码 (如 zh, en, ja)
+                .prompt("")                           // 可选提示词，引导识别风格
+                .temperature(0.0)                     // 采样温度，默认 0
+                .build();
+
+        WhisperResult result = service.whisper(request, audioFile);
+        System.out.println("识别结果: " + result.getText());
+    }
+}
+```
+
+**参数说明：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `model` | String | ✅ | 模型名称，目前仅支持 `whisper-1` |
+| `responseFormat` | String | ❌ | 输出格式：`json`(默认), `text`, `srt`, `verbose_json`, `vtt` |
+| `language` | String | ❌ | 音频语言 ISO-639-1 编码，如 `zh`(中文), `en`(英文), `ja`(日文) |
+| `prompt` | String | ❌ | 提示词，用于引导模型识别风格或继续之前的音频 |
+| `temperature` | Double | ❌ | 采样温度，范围 `0.0` ~ `1.0`，默认 `0.0` |
+
+---
 ## 🗂️ 核心包结构与架构说明
 
 - **`com.kylin.fast.openai.api`**: 基于 Retrofit 封装的核心网络调用服务层。
