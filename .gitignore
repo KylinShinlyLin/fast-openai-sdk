@@ -72,3 +72,5 @@ test_speech_output.mp3
 /publish-settings.xml
 src/test/resources/fast-openai.properties
 /.qoze/
+private-settings.xml
+private-deploy.sh

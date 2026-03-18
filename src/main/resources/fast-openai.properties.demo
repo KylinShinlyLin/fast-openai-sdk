@@ -11,3 +11,5 @@ openai.api.maxRetries=3
 # openai.proxy.port=7890
 # openai.proxy.type=HTTP
 # jina.api.key=sh-xxxxxxxxx
+# tavily.api.key=tvly-xxxx
+# tavily.api.baseUrl=https://api.tavily.com/

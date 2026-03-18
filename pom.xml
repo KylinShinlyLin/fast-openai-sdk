@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.kylinshinlylin</groupId>
@@ -85,7 +83,7 @@
             <version>3.12.0</version>
         </dependency>
 
-        <!-- Retrofit -->
+        
         <dependency>
             <groupId>com.squareup.retrofit2</groupId>
             <artifactId>retrofit</artifactId>
@@ -102,7 +100,7 @@
             <version>${retrofit.version}</version>
         </dependency>
 
-        <!-- OkHttp -->
+        
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
@@ -119,7 +117,7 @@
             <version>${okhttp.version}</version>
         </dependency>
 
-        <!-- Jackson -->
+        
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -131,7 +129,7 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- Lombok -->
+        
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -139,14 +137,14 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- SLF4J -->
+        
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
 
-        <!-- JUnit for Testing -->
+        
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -157,11 +155,11 @@
 
     <build>
         <plugins>
-            <!-- 编译插件 -->
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>8</source>
                     <target>8</target>
@@ -176,21 +174,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Central Publishing 插件 -->
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.4.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>central</publishingServerId>
-                    <tokenAuth>true</tokenAuth>
-                    <!-- autoPublish 置为 true，上传校验通过后自动发布 -->
-                    <autoPublish>true</autoPublish>
-                </configuration>
-            </plugin>
-
-            <!-- 生成 Source 源码包 -->
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -207,7 +191,7 @@
                 </executions>
             </plugin>
 
-            <!-- 生成 Javadoc 文档包 -->
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -225,7 +209,7 @@
                 </executions>
             </plugin>
 
-            <!-- GPG 签名插件 -->
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -242,4 +226,18 @@
             </plugin>
         </plugins>
     </build>
-</project>
+<profiles><profile><id>release-central</id><build><plugins><plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.4.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <tokenAuth>true</tokenAuth>
+                    
+                    <autoPublish>true</autoPublish>
+                </configuration>
+            </plugin>
+
+            
+            </plugins></build></profile></profiles></project>

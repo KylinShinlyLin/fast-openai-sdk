@@ -17,6 +17,10 @@ public class OpenAiConfig {
     private Proxy proxy;
     private int maxRetries = 3;
 
+    // Tavily config
+    private String tavilyApiKey;
+    private String tavilyBaseUrl = "https://api.tavily.com/";
+
     public static OpenAiConfig loadFromProperties() {
         return loadFromProperties("fast-openai.properties");
     }
@@ -56,6 +60,17 @@ public class OpenAiConfig {
             if (proxyHost != null && proxyPort != null) {
                 Proxy.Type type = Proxy.Type.valueOf(proxyType.toUpperCase());
                 config.setProxy(new Proxy(type, new InetSocketAddress(proxyHost, Integer.parseInt(proxyPort))));
+            }
+
+            // Load Tavily config
+            String tavilyKey = prop.getProperty("tavily.api.key");
+            if (tavilyKey != null && !tavilyKey.isEmpty()) {
+                config.setTavilyApiKey(tavilyKey);
+            }
+            
+            String tavilyBaseUrl = prop.getProperty("tavily.api.baseUrl");
+            if (tavilyBaseUrl != null && !tavilyBaseUrl.isEmpty()) {
+                config.setTavilyBaseUrl(tavilyBaseUrl);
             }
 
         } catch (Exception ex) {
