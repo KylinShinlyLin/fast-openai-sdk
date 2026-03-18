@@ -260,6 +260,7 @@ public class ImageGenerationTest {
                 .model("gpt-image-1")
                 .size("1024x1024")
                 .n(1)
+                .quality("low")
                 .build();
 
         long startTime = System.currentTimeMillis();
