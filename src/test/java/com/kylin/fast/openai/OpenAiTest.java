@@ -126,11 +126,12 @@ public class OpenAiTest {
         String imageUrl = "https://pic.616pic.com/photoone/00/02/58/618cf527354c35308.jpg!/fw/1120";
 
         ChatRequest request = ChatRequest.builder()
-                .model("gpt-5.4")
+                .model("gpt-5.4-mini")
                 .addMessage(ImgMessage.of(
                         MessageRole.user,
                         "请描述这张图片的内容",
                         imageUrl))
+                .reasoningEffort("low")
                 .build();
 
         ChatResult result = service.createChat(request);
