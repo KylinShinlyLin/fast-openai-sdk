@@ -39,6 +39,7 @@ public class ChatRequest {
      */
     @SerializedName("reasoning_effort")
     String reasoningEffort;
+
     /**
      * 返回消息类型 ["text", "audio"]
      */
