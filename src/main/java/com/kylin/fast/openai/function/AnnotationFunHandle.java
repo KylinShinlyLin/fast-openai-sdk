@@ -21,6 +21,10 @@ public class AnnotationFunHandle extends AbstractFunHandle {
 
     private final Object handler;
     private final Method method;
+
+    public Method getMethod() {
+        return method;
+    }
     private final String name;
     private final String description;
 
