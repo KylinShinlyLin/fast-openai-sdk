@@ -152,10 +152,14 @@ public class CompiledGraph<S> {
         };
     }
 
+    /** ReAct 循环最大步数，防止 LLM tool-call 无限循环 */
+    private static final int MAX_STEPS = 50;
+
     private void driveGraph(S state, GraphConfig config, LinkedBlockingQueue<GraphEvent> queue) throws Exception {
         String threadId = config.getThreadId();
         String currentNode = StateGraph.START;
         S runState = state;
+        int stepCount = 0;
 
         // 检查是否有现有 Checkpoint
         if (threadId != null && saver != null) {
@@ -173,6 +177,13 @@ public class CompiledGraph<S> {
 
         // 运行生命周期驱动
         while (currentNode != null && !StateGraph.END.equals(currentNode)) {
+            // 0. 步数上限保护
+            if (++stepCount > MAX_STEPS) {
+                queue.put(new GraphEvent("error", null,
+                        "ReAct max steps (" + MAX_STEPS + ") exceeded. Loop aborted to prevent infinite execution."));
+                break;
+            }
+
             // 1. 检查 interruptBefore
             if (config.getInterruptBefore() != null && config.getInterruptBefore().contains(currentNode)) {
                 saveCheckpoint(threadId, currentNode, runState);
@@ -187,8 +198,9 @@ public class CompiledGraph<S> {
                 throw new IllegalStateException("Node not found in graph: " + currentNode);
             }
 
-            // 注入 Emitter 支持 Token 透传
+            // 注入 Emitter 支持 Token 透传 + CompiledGraph 供节点内获取工具注册
             GraphContext.setEmitter(queue::offer);
+            GraphContext.setCompiledGraph(this);
             Map<String, Object> update;
             try {
                 update = nodeExecutor.apply(runState);

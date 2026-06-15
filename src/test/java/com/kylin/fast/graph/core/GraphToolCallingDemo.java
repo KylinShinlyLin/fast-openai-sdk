@@ -229,7 +229,7 @@ public class GraphToolCallingDemo {
 
         // ---------- 3.5 添加 Action 节点（工具并发执行） ----------
         // 🌟 使用内置的 OpenAiActionNode，自动并行执行工具！
-        graph.addNode("action", new OpenAiActionNode<>(compiled));
+        graph.addNode("action", OpenAiActionNode.create());
 
         // ---------- 3.6 连线 ----------
         graph.addEdge(StateGraph.START, "agent");

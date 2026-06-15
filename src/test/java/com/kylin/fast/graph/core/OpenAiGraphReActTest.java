@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * 🌟 [生产级终极黄金模板] 极简并发 ReAct Agent 状态图测试
- * 
+ * <p>
  * 通过将 [Agent Node] 封装为 {@link OpenAiAgentNode}，将 [Action Node] 封装为 {@link OpenAiActionNode}，
  * 使得整套复杂、高并发的 ReAct 智能体编排，缩减到了两行核心代码！
  * 同时保留了自定义的高保真反射、多线程 parallelStream 并行与 100% 状态隔离。
- * 
+ *
  * <pre>
  *   ┌─────────┐     有 ToolCalls     ┌──────────┐
  *   │  agent  │ ─────────────────→  │  action   │
@@ -32,9 +32,9 @@ import static org.junit.jupiter.api.Assertions.*;
  *        ▼
  *     __end__
  * </pre>
- * 
+ * <p>
  * 参考: OpenAiGraphTest4 (openai-api 项目)
- * 
+ *
  * @author AI Agent
  */
 public class OpenAiGraphReActTest {
@@ -50,6 +50,7 @@ public class OpenAiGraphReActTest {
     }
 
     // ==================== 2. 定义工具类 (使用 @AiFunction 注解) ====================
+
     /**
      * 工具类 —— 用 @AiFunction 注解标记的方法会自动被 CompiledGraph.registerTools() 解析，
      * 生成 GptTool 元数据发给大模型，并在大模型返回 tool_calls 时自动反射调用。
@@ -79,9 +80,12 @@ public class OpenAiGraphReActTest {
         ) {
             System.out.println(String.format("  🧮 [calculator] %s %s %s", a, operation, b));
             switch (operation) {
-                case "add":      return a + b;
-                case "subtract": return a - b;
-                case "multiply": return a * b;
+                case "add":
+                    return a + b;
+                case "subtract":
+                    return a - b;
+                case "multiply":
+                    return a * b;
                 case "divide":
                     if (b == 0) throw new IllegalArgumentException("除数不能为零");
                     return a / b;
@@ -120,10 +124,10 @@ public class OpenAiGraphReActTest {
                 .toArray());
 
         // 🌟 3.4 [Node] agent 节点：一句话调用通用大模型决策节点
-        graph.addNode("agent", state -> OpenAiAgentNode.create(service, "gpt-5.4", compiled).apply(state));
+        graph.addNode("agent", state -> OpenAiAgentNode.create(service, "gpt-5.4").apply(state));
 
         // 🌟 3.5 [Node] action 节点：一句话调用通用高并发工具并行节点
-        graph.addNode("action", state -> OpenAiActionNode.create(compiled).apply(state));
+        graph.addNode("action", state -> OpenAiActionNode.create().apply(state));
 
         // 3.6 [Edges] 编排连线
         graph.addEdge(StateGraph.START, "agent");
@@ -162,7 +166,7 @@ public class OpenAiGraphReActTest {
         ChatMessage lastMsg = finalState.getMessages().get(finalState.getMessages().size() - 1);
         assertEquals("assistant", lastMsg.getRole());
         // 验证最终结果包含求和结果：25 + 22 = 47
-        assertTrue(lastMsg.getContent().contains("47"), 
+        assertTrue(lastMsg.getContent().contains("47"),
                 "期望最终回复包含求和结果 47，实际: " + lastMsg.getContent());
     }
 

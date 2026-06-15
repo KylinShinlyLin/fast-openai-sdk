@@ -5,6 +5,14 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.io.File;
 import com.kylin.fast.openai.utils.Base64Tools;
+import com.kylin.fast.openai.request.dto.BaseMessage;
+import com.kylin.fast.openai.request.dto.ImgMessage;
+import com.kylin.fast.openai.request.dto.ImgMessageContent;
+import com.kylin.fast.openai.request.dto.ImageUrl;
+import com.kylin.fast.openai.request.dto.Message;
+import com.kylin.fast.openai.request.dto.GptFunction;
+import com.kylin.fast.openai.request.dto.GptTool;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,5 +75,81 @@ public class ChatMessage {
             }
         }
         return image(content, base64List);
+    }
+
+    /**
+     * 从 SDK BaseMessage 转换为 ChatMessage（Redis 持久化 → Graph 状态）。
+     */
+    public static ChatMessage from(BaseMessage bm) {
+        if (bm instanceof ImgMessage) {
+            ImgMessage img = (ImgMessage) bm;
+            List<String> urls = new ArrayList<>();
+            StringBuilder text = new StringBuilder();
+            if (img.getContent() != null) {
+                for (ImgMessageContent ic : img.getContent()) {
+                    if (ic.getImage_url() != null && ic.getImage_url().getUrl() != null) {
+                        urls.add(ic.getImage_url().getUrl());
+                    } else if ("text".equals(ic.getType()) && ic.getText() != null) {
+                        text.append(ic.getText());
+                    }
+                }
+            }
+            return ChatMessage.image(text.toString(), urls);
+        }
+        if (bm instanceof Message) {
+            Message msg = (Message) bm;
+            if ("tool".equals(msg.roleType())) {
+                return ChatMessage.tool(msg.getName(), msg.getContent(), msg.getToolCallId());
+            }
+            if (msg.getToolCalls() != null && !msg.getToolCalls().isEmpty()) {
+                List<ToolCall> tcs = new ArrayList<>();
+                for (GptTool gt : msg.getToolCalls()) {
+                    if (gt.getFunction() != null) {
+                        tcs.add(new ToolCall(gt.getId(), gt.getFunction().getName(), gt.getFunction().getArguments()));
+                    }
+                }
+                return ChatMessage.assistant(msg.getContent(), tcs);
+            }
+            if ("assistant".equals(msg.roleType())) {
+                return ChatMessage.assistant(msg.getContent());
+            }
+            if ("system".equals(msg.roleType())) {
+                return ChatMessage.system(msg.getContent());
+            }
+            return ChatMessage.user(msg.getContent());
+        }
+        return ChatMessage.user(bm.toString());
+    }
+
+    /**
+     * 从 ChatMessage 转换为 SDK BaseMessage（Graph 状态 → Redis 持久化 / SDK 调用）。
+     */
+    public BaseMessage toBaseMessage() {
+        if ("image".equals(this.messageType) && this.imageUrls != null && !this.imageUrls.isEmpty()) {
+            List<ImgMessageContent> contents = new ArrayList<>();
+            if (this.content != null && !this.content.isEmpty()) {
+                contents.add(ImgMessageContent.builder().type("text").text(this.content).build());
+            }
+            for (String url : this.imageUrls) {
+                contents.add(ImgMessageContent.builder().type("image_url")
+                        .image_url(ImageUrl.builder().url(url).detail("high").build()).build());
+            }
+            return ImgMessage.builder().role(this.role).content(contents).build();
+        }
+        Message msg = new Message();
+        msg.setRole(this.role);
+        msg.setContent(this.content);
+        msg.setName(this.name);
+        msg.setToolCallId(this.toolCallId);
+        if (this.toolCalls != null && !this.toolCalls.isEmpty()) {
+            List<GptTool> tcs = new ArrayList<>();
+            for (ToolCall tc : this.toolCalls) {
+                tcs.add(GptTool.builder().id(tc.getId())
+                        .function(GptFunction.builder().name(tc.getName()).arguments(tc.getArguments()).build())
+                        .type("function").build());
+            }
+            msg.setToolCalls(tcs);
+        }
+        return msg;
     }
 }

@@ -16,6 +16,9 @@ public class GptTool {
 
     String id;
 
+    /** 🌟 流式并行工具调用：标识此工具调用在 choices[0].delta.tool_calls 数组中的位置 */
+    Integer index;
+
     GptFunction function;
     /**
      * TODO openai 后面可能会有更多的工具
