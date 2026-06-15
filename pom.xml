@@ -5,7 +5,7 @@
 
     <groupId>io.github.kylinshinlylin</groupId>
     <artifactId>fast-openai-sdk</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <name>Fast OpenAI SDK</name>
     <description>A fast and lightweight OpenAI SDK for Java</description>
